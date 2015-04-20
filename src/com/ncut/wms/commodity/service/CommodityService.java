@@ -1,27 +1,30 @@
 package com.ncut.wms.commodity.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JsonConfig;
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
 
 import com.ncut.wms.commodity.dao.CommodityDAO;
+import com.ncut.wms.commodity.dto.CommodityDTO;
 import com.ncut.wms.commodity.model.Commodity;
-import com.ncut.wms.commodity.model.CommodityCategory;
+import com.ncut.wms.unit.dao.UnitDAO;
 import com.ncut.wms.unit.model.Unit;
-import com.ncut.wms.util.json.ObjectJsonValueProcessor;
 
-@Component("commodityService")
+@Service("commodityService")
 public class CommodityService {
 
 	private CommodityDAO commodityDAO;
+	private UnitDAO unitDAO;
 
 	/**
-	 * ������Ʒ����
+	 * 计算商品总数
 	 * @return
 	 */
 	public int total() {
@@ -30,9 +33,9 @@ public class CommodityService {
 	}
 
 	/**
-	 * ���ݷ�ҳ��ȡ��Ʒ�б�
-	 * @param currentPage ��ǰҳ
-	 * @param pageSize ҳ����ʾ��������
+	 * 根据分页获取商品列表
+	 * @param currentPage 当前页
+	 * @param pageSize 页面显示数据数量
 	 * @return
 	 */
 	public List<Commodity> getCommodityListByPage(int currentPage, int pageSize) {
@@ -42,30 +45,57 @@ public class CommodityService {
 	}
 	
 	/**
-	 * �����Ʒ�б���json�ַ���
-	 * @param currentPage
-	 * @param pageSize
+	 * 获得商品列表的json字符串
+	 * @param currentPage 当前页
+	 * @param pageSize 页面显示数据数量
 	 * @return
 	 */
-	public String getCommodityListJson(int currentPage, int pageSize) {
+	public String getCommodityListJsonByPage(int currentPage, int pageSize) {
 		List<Commodity> commodityList = commodityDAO.findByPagination(
 				currentPage, pageSize);
-		// ƴJason�ַ��� {"total":total , "rows":[{},{}]}
-		JsonConfig config = new JsonConfig();
-		config.registerJsonValueProcessor(CommodityCategory.class,
-				new ObjectJsonValueProcessor(
-						new String[] { "commodityCategoryName" },
-						CommodityCategory.class));
-		config.registerJsonValueProcessor(Unit.class,
-				new ObjectJsonValueProcessor(new String[] { "unitName" },
-						Unit.class));
+		// 拼Jason字符串 {"total":total , "rows":[{},{}]}
+		
 		String commodityListStr = "{\"total\":" + this.total() + " , \"rows\":"
-				+ JSONArray.fromObject(commodityList, config).toString() + "}";
+				+ JSONArray.fromObject(commodityList).toString() + "}";
 		return commodityListStr;
 	}
 	
 	/**
-	 * ��ȡ������Ʒ�б�
+	 * 查询商品列表的json字符串
+	 * @param currentPage 当前页
+	 * @param pageSize 页面显示数据数量
+	 * @param searchWords 搜索关键词
+	 * @return
+	 */
+	public String getCommodityListJsonByPage(int currentPage, int pageSize, Map<String, Object> searchWords) {
+		List<Commodity> commodityList = commodityDAO.findByPagination(
+				currentPage, pageSize, searchWords);
+		//将每个商品信息中的商品类别和单位进行转义
+		List<CommodityDTO> cDTOList = new ArrayList<CommodityDTO>();
+		for(Commodity c : commodityList) {
+			
+			CommodityDTO cDTO = new CommodityDTO();
+			//CommodityDTO cDTO = Model2DTO(c);
+			BeanUtils.copyProperties(c, cDTO);
+			
+			Unit unit = unitDAO.findById(c.getCommodityUnit());
+			if(unit != null) {
+				cDTO.setCommodityUnitName(unit.getUnitName());
+			}
+			
+			cDTOList.add(cDTO);
+			
+		}
+		
+		// 拼Jason字符串 {"total":total , "rows":[{},{}]}
+		String commodityListStr = "{\"total\":" + this.total() + " , \"rows\":"
+				+ JSONArray.fromObject(cDTOList).toString() + "}";
+		return commodityListStr;
+	}
+	
+	
+	/**
+	 * 获取所有商品列表
 	 * @return
 	 */
 	public List<Commodity> getCommodityList() {
@@ -74,8 +104,21 @@ public class CommodityService {
 	}
 
 	public void add(Commodity commodity) {
-		//commodityDAO.add(commodity);
-		System.out.println(commodity.toString());
+		commodityDAO.save(commodity);
+		//System.out.println("cc" + commodity.getCommodityCategory().toString());
+	}
+
+	public void update(Commodity commodity) {
+		commodityDAO.update(commodity);
+		
+	}
+	
+	public void delete(Commodity commodity) {
+		commodityDAO.delete(commodity);
+	}
+	
+	public void delete(Integer id) {
+		commodityDAO.delete(id);
 	}
 
 	public CommodityDAO getCommodityDAO() {
@@ -85,6 +128,11 @@ public class CommodityService {
 	@Resource
 	public void setCommodityDAO(CommodityDAO commodityDAO) {
 		this.commodityDAO = commodityDAO;
+	}
+	
+	@Resource
+	public void setUnitDAO(UnitDAO unitDAO) {
+		this.unitDAO = unitDAO;
 	}
 
 }

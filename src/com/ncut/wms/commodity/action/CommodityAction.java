@@ -1,87 +1,192 @@
 package com.ncut.wms.commodity.action;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import org.apache.struts2.ServletActionContext;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import com.ncut.wms.commodity.model.Commodity;
 import com.ncut.wms.commodity.service.CommodityService;
+import com.ncut.wms.unit.service.UnitService;
+import com.ncut.wms.util.json.Json;
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.ModelDriven;
 
-@Component("commodityAction")
+@Controller("commodityAction")
 @Scope("prototype")
-public class CommodityAction extends ActionSupport implements ModelDriven<Commodity> {
+public class CommodityAction extends ActionSupport implements
+		ModelDriven<Commodity> {
 
-	@Resource
 	private CommodityService commodityService;
-	
+	private UnitService unitService;
 	private Commodity commodity = new Commodity();
-	
+
 	/**
-	 * Ìø×ªÉÌÆ·ĞÅÏ¢¹ÜÀíÒ³Ãæ
+	 * è·³è½¬å•†å“ä¿¡æ¯ç®¡ç†é¡µé¢
+	 * 
 	 * @return
 	 */
 	public String managementPage() {
-		
+
 		return "managementPage";
 	}
-	
+
 	/**
-	 * »ñÈ¡ÉÌÆ·ĞÅÏ¢ÁĞ±í
+	 * è·å–å•†å“ä¿¡æ¯åˆ—è¡¨
+	 * 
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public String getCommodityList() throws IOException {
-		
-		// »ñµÃrequest¶ÔÏó£¬»ñÈ¡Ò³ÃæÊı¾İ
+
+		// è·å¾—requestå¯¹è±¡ï¼Œè·å–é¡µé¢æ•°æ®
 		HttpServletRequest request = ServletActionContext.getRequest();
-		// »ñµÃµ±Ç°Ò³
+		// è·å¾—å½“å‰é¡µ
 		int currentPage = Integer.parseInt(request.getParameter("page"));
-		// »ñµÃÒ»Ò³ÏÔÊ¾µÄÊı¾İÊıÁ¿
+		// è·å¾—ä¸€é¡µæ˜¾ç¤ºçš„æ•°æ®æ•°é‡
 		int pageSize = Integer.parseInt(request.getParameter("rows"));
-		//Í¨¹ı·ÖÒ³»ñµÃ¶ÔÓ¦ÉÌÆ·ÁĞ±íµÄjson×Ö·û´®
-		String commodityList = commodityService.getCommodityListJson(currentPage, pageSize);
-		// »ñµÃresponse¶ÔÏó,ÏìÓ¦Ò³Ãæ:
+		// è·å–æ’åºçš„æ–¹å¼
+		String order = request.getParameter("order") == null ? "" : request
+				.getParameter("order");
+		// è·å–æ’åºçš„å­—æ®µ
+		String sort = request.getParameter("sort") == null ? "" : request
+				.getParameter("sort");
+
+		// æŸ¥è¯¢æ•°æ®å­˜å…¥map
+		Map<String, Object> m = new HashMap<String, Object>();
+		m.put("commodityName", commodity.getCommodityName());
+		m.put("sort", sort);
+		m.put("order", order);
+
+		// é€šè¿‡åˆ†é¡µè·å¾—å¯¹åº”å•†å“åˆ—è¡¨çš„jsonå­—ç¬¦ä¸²
+		String commodityList = commodityService.getCommodityListJsonByPage(
+				currentPage, pageSize, m);
+		// è·å¾—responseå¯¹è±¡,å“åº”é¡µé¢:
 		HttpServletResponse response = ServletActionContext.getResponse();
 		response.setContentType("text/html;charset=UTF-8");
 		response.getWriter().write(commodityList);
 		return NONE;
 	}
-	
+
 	/**
-	 * Ìí¼ÓÉÌÆ·ĞÅÏ¢
+	 * è·å–è®¡é‡å•ä½åˆ—è¡¨
+	 * 
 	 * @return
 	 */
-	public String addCommodity() {
-		// »ñµÃresponse¶ÔÏó,ÏìÓ¦Ò³Ãæ:
+	public String getUnitList() {
+
+		String unitList = unitService.getUnitListJson();
+
 		HttpServletResponse response = ServletActionContext.getResponse();
 		try {
-			commodityService.add(commodity);
 			response.setContentType("text/html;charset=UTF-8");
-			String str = "{\"status\":\"ok\" , \"message\":\"²Ù×÷³É¹¦!\"}";
-
-			response.getWriter().write(str);
+			response.getWriter().write(unitList);
 		} catch (IOException e) {
-			response.setContentType("text/html;charset=utf-8");
-			String str = "{\"status\":\"fail\" , \"message\":\"²Ù×÷Ê§°Ü!\"}";
-			try {
-				response.getWriter().write(str);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
 			e.printStackTrace();
 		}
 		return NONE;
+	}
+
+	/**
+	 * æ·»åŠ å•†å“ä¿¡æ¯
+	 * 
+	 * @return
+	 */
+	public String addCommodity() {
+		Json json = new Json();
+		// è·å¾—responseå¯¹è±¡,å“åº”é¡µé¢:
+		HttpServletResponse response = ServletActionContext.getResponse();
+		try {
+			commodityService.add(commodity);
+			json.setSuccess(true);
+			json.setMessage("æ·»åŠ å•†å“ä¿¡æ¯æˆåŠŸ");
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setSuccess(false);
+			json.setMessage("æ·»åŠ å•†å“ä¿¡æ¯å¤±è´¥");
+		}
+		try {
+			response.setContentType("text/html;charset=utf-8");
+			response.getWriter().write(JSONObject.fromObject(json).toString());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		return NONE;
+	}
+
+	/**
+	 * ä¿®æ”¹å•†å“ä¿¡æ¯
+	 * 
+	 * @return
+	 */
+	public String updateCommodity() {
+		Json json = new Json();
+		// è·å¾—responseå¯¹è±¡,å“åº”é¡µé¢:
+		HttpServletResponse response = ServletActionContext.getResponse();
+		try {
+			commodityService.update(commodity);
+			json.setSuccess(true);
+			json.setMessage("ä¿®æ”¹å•†å“ä¿¡æ¯æˆåŠŸ");
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setSuccess(false);
+			json.setMessage("ä¿®æ”¹å•†å“ä¿¡æ¯å¤±è´¥");
+		}
+		try {
+			response.setContentType("text/html;charset=utf-8");
+			response.getWriter().write(JSONObject.fromObject(json).toString());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		return NONE;
+	}
+
+	public String deleteCommodity() {
+		Json json = new Json();
+		// è·å¾—responseå¯¹è±¡,å“åº”é¡µé¢:
+		HttpServletResponse response = ServletActionContext.getResponse();
+		HttpServletRequest request = ServletActionContext.getRequest();
+		try {
+			String ids[] = request.getParameter("ids").split(",");
+			System.out.println(ids.toString());
+
+			for (int i = 0; i < ids.length; i++) {
+				commodityService.delete(Integer.valueOf(ids[i]));
+			}
+
+			json.setSuccess(true);
+			json.setMessage("åˆ é™¤å•†å“ä¿¡æ¯æˆåŠŸ");
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setSuccess(false);
+			json.setMessage("åˆ é™¤å•†å“ä¿¡æ¯å¤±è´¥");
+		}
+		try {
+			response.setContentType("text/html;charset=utf-8");
+			response.getWriter().write(JSONObject.fromObject(json).toString());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		return NONE;
+	}
+
+	@Resource
+	public void setCommodityService(CommodityService commodityService) {
+		this.commodityService = commodityService;
+	}
+
+	@Resource
+	public void setUnitService(UnitService unitService) {
+		this.unitService = unitService;
 	}
 
 	public void setCommodity(Commodity commodity) {
@@ -90,8 +195,10 @@ public class CommodityAction extends ActionSupport implements ModelDriven<Commod
 
 	@Override
 	public Commodity getModel() {
+		if (commodity.getCommodityName() == null) {
+			commodity.setCommodityName("");
+		}
 		return commodity;
 	}
-
 
 }
