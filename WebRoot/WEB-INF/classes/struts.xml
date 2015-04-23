@@ -14,11 +14,28 @@
         <!-- 配置首页访问的Action -->
 		<action name="index" class="index">
 			<result name="index">/WEB-INF/jsp/index.jsp</result>
+			<result name="login">/WEB-INF/jsp/login.jsp</result>
+		</action>
+		
+		<action name="index_login" class="index"  method="login">
+			<result name="index">/WEB-INF/jsp/index.jsp</result>
+		</action>
+		
+		<!-- 配置用户模块 -->
+		<action name="userAction_*" class="userAction" method="{1}">
+			<result name="index">/WEB-INF/jsp/index.jsp</result>
+			<result name="logout">/WEB-INF/jsp/login.jsp</result>
 		</action>
 		
 		<!-- 配置商品管理模块 -->
 		<action name="commodityAction_*" class="commodityAction" method="{1}">
 			<result name="managementPage">/WEB-INF/jsp/commodityManagement.jsp</result>
+			
+		</action>
+		
+		<!-- 配置商品类别模块 -->
+		<action name="cmdtCtgrAction_*" class="cmdtCtgrAction" method="{1}">
+			<result name="managementPage">/WEB-INF/jsp/commodityCategoryManagement.jsp</result>
 			
 		</action>
 		
@@ -28,11 +45,25 @@
 			
 		</action>
 		
-		<!-- 配置商品分类管理模块 -->
-		<action name="commodityCategoryAction_*" class="commodityCategoryAction" method="{1}">
-			<result name="managementPage">/WEB-INF/jsp/commodityCategoryManagement.jsp</result>
+		<!-- 配置供应商管理模块 -->
+		<action name="supplierAction_*" class="supplierAction" method="{1}">
+			<result name="managementPage">/WEB-INF/jsp/supplierManagement.jsp</result>
 			
 		</action>
+		
+		<!-- 配置客户管理模块 -->
+		<action name="clientAction_*" class="clientAction" method="{1}">
+			<result name="managementPage">/WEB-INF/jsp/clientManagement.jsp</result>
+			
+		</action>
+		
+		<!-- 进货管理模块 -->
+		<action name="purchaseAction_*" class="purchaseAction" method="{1}">
+			<result name="addPage">/WEB-INF/jsp/purchaseAdd.jsp</result>
+			
+		</action>
+		
+		
     </package>
 
 
