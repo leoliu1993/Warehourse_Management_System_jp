@@ -1,0 +1,2 @@
+# Warehourse_Management_System_jp
+大学時代卒業論文の成果物。倉庫管理システム。READMEファイルは日本語化できました。
