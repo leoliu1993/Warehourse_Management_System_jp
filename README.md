@@ -2,32 +2,32 @@
 This is my graduation Thesis(graduation project). This program is a Warehouse Management System. I have translated readme file in Japanese.
 大学時代卒業論文の成果物です。このプログラムは倉庫管理システムです。READMEファイルは日本語化ができました。
 
-Mysql's backup is in Webroot/WEB-INF/sql.
+The backup of Mysql is in Webroot/WEB-INF/sql.
 MysqlのバックアップはWebrootにあるWEB-INFファイルの中のsqlファイルにあります。
 
 JDBC, Struts sort of configured files are in src file.
 JDBC、Strutsなどの配置ファイルはsrcファイルにあります。
 
-The homepage's url is http://localhost:8080/WMS/index.
-ホームページのURLは　http://localhost:8080/WMS/index　です。
+The homepage is http://localhost:8080/[project's name]/index.
+ホームページのURLは　http://localhost:8080/[プロジェクトの名前]/index　です。
 
 The account and password to enter the system are admin.
 登録アカウントはadmin、パスワードはadminです。
 
-使った技術(used technology)：
-１．	TOMCAT
-２．	Struts
-３．	Spring
-４．	Hibernate
-５．	JQuery EasyUI
-６．	Mysql
-７．	Git
-８．	Junit
+used technology(使った技術)：
+1. TOMCAT
+2. Struts
+3. Spring
+4. Hibernate
+5. JQuery EasyUI
+6. Mysql
+7. Git
+8. Junit
 
-使った言語(used program language)：
-１．	Java(アフターエンド)
-２．	HTML/CSS
-３．	JavaScript
-４．	JSP
+used program language(使った言語)：
+1. Java(アフターエンド)
+2. HTML/CSS
+3. JavaScript
+4. JSP
 
 
