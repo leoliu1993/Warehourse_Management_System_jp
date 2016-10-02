@@ -1,5 +1,5 @@
 # Warehourse_Management_System_jp
-It is my graduation Thesis(graduation project). This program is a Warehouse Management System. I have translated readme file in Japanese.
+This is my graduation Thesis(graduation project). This program is a Warehouse Management System. I have translated readme file in Japanese.
 大学時代卒業論文の成果物です。このプログラムは倉庫管理システムです。READMEファイルは日本語化ができました。
 
 Mysql's backup is in Webroot/WEB-INF/sql.
