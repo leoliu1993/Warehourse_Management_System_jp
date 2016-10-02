@@ -14,7 +14,7 @@ The homepage is http://localhost:8080/[project's name]/index.
 The account and password to enter the system are admin.
 登録アカウントはadmin、パスワードはadminです。
 
-used technology(使った技術)：
+Used technology(使った技術)：
 1. TOMCAT
 2. Struts
 3. Spring
@@ -24,7 +24,7 @@ used technology(使った技術)：
 7. Git
 8. Junit
 
-used program language(使った言語)：
+Used program language(使った言語)：
 1. Java(アフターエンド)
 2. HTML/CSS
 3. JavaScript
